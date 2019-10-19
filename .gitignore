@@ -13,3 +13,6 @@ web-report/
 .idea
 .expo-shared
 package-lock.json
+.idea
+yarn-error.log
+.watchmanconfig
