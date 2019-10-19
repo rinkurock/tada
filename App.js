@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput, Button } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  ScrollView,
+  FlatList
+} from "react-native";
 
 export default function App() {
   const [enteredGoal, setEnteredGoal] = useState("");
@@ -10,10 +18,14 @@ export default function App() {
   };
 
   const addGoalHandler = () => {
-    setCourseGoals(currentGoals => [...currentGoals, enteredGoal]);
+    setCourseGoals(currentGoals => [
+      ...currentGoals,
+      { id: Math.random().toString(), value: enteredGoal }
+    ]);
   };
 
   return (
+    // <ScrollView>
     <View style={styles.layout}>
       <View style={styles.inputBox}>
         <TextInput
@@ -25,11 +37,23 @@ export default function App() {
         <Button title="ADD" onPress={addGoalHandler} />
       </View>
       <View>
-        {courseGoals.map(goal => (
-          <Text>{goal}</Text>
-        ))}
+        <FlatList
+          keyExtractor={(item, index) => item.id}
+          data={courseGoals}
+          renderItem={itemData => (
+            <View style={styles.listItem}>
+              <Text>{itemData.item.value}</Text>
+            </View>
+          )}
+        />
+        {/* {courseGoals.map(goal => (
+            <View key={goal} style={styles.listItem}>
+              <Text>{goal}</Text>
+            </View>
+          ))} */}
       </View>
     </View>
+    // </ScrollView>
   );
 }
 
@@ -51,5 +75,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center"
+  },
+  listItem: {
+    padding: 10,
+    backgroundColor: "#ccc",
+    marginVertical: 10
   }
 });
