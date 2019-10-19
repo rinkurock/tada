@@ -1,57 +1,70 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
-  ScrollView,
-  FlatList
-} from "react-native";
+import { StyleSheet, View, FlatList, Button, Alert } from "react-native";
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState("");
   const [courseGoals, setCourseGoals] = useState([]);
+  const [isAddMode, setIsAddMode] = useState(false);
 
-  const goalInputHandler = enteredText => {
-    setEnteredGoal(enteredText);
+  const cancelAddGoalModal = () => {
+    setIsAddMode(false);
   };
 
-  const addGoalHandler = () => {
+  const addGoalHandler = goalTitle => {
     setCourseGoals(currentGoals => [
       ...currentGoals,
-      { id: Math.random().toString(), value: enteredGoal }
+      { id: Math.random().toString(), value: goalTitle }
     ]);
+    setIsAddMode(false);
+  };
+  const removeGoalHandler = goalId => {
+    console.log(goalId);
+    Alert.alert(
+      "Want to remove the goal",
+      "My Alert Msg",
+      [
+        {
+          text: "Ask me later",
+          onPress: () => console.log("Ask me later pressed")
+        },
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => confirmGoalRemove(goalId) }
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const confirmGoalRemove = goalId => {
+    setCourseGoals(currentGoals => {
+      return currentGoals.filter(goal => goal.id !== goalId);
+    });
   };
 
   return (
     // <ScrollView>
     <View style={styles.layout}>
-      <View style={styles.inputBox}>
-        <TextInput
-          placeholder="New task"
-          style={styles.textInput}
-          onChangeText={goalInputHandler}
-          value={enteredGoal}
-        />
-        <Button title="ADD" onPress={addGoalHandler} />
-      </View>
-      <View>
-        <FlatList
-          keyExtractor={(item, index) => item.id}
-          data={courseGoals}
-          renderItem={itemData => (
-            <View style={styles.listItem}>
-              <Text>{itemData.item.value}</Text>
-            </View>
-          )}
-        />
-        {/* {courseGoals.map(goal => (
-            <View key={goal} style={styles.listItem}>
-              <Text>{goal}</Text>
-            </View>
-          ))} */}
-      </View>
+      <Button title="Add New Goal" onPress={() => setIsAddMode(true)} />
+      <GoalInput
+        visitable={isAddMode}
+        onAddGoal={addGoalHandler}
+        onCancel={cancelAddGoalModal}
+      />
+      <FlatList
+        keyExtractor={(item, index) => item.id}
+        data={courseGoals}
+        renderItem={itemData => (
+          <GoalItem
+            id={itemData.item.id}
+            onDelete={removeGoalHandler}
+            title={itemData.item.value}
+          />
+        )}
+      />
     </View>
     // </ScrollView>
   );
@@ -64,21 +77,5 @@ const styles = StyleSheet.create({
     padding: 100
     //alignItems: 'center',
     //justifyContent: 'center',
-  },
-  textInput: {
-    borderBottomColor: "#ccc",
-    borderWidth: 1,
-    padding: 10,
-    width: "80%"
-  },
-  inputBox: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  listItem: {
-    padding: 10,
-    backgroundColor: "#ccc",
-    marginVertical: 10
   }
 });
