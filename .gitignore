@@ -12,3 +12,4 @@ web-report/
 .vscode
 .idea
 .expo-shared
+package-lock.json
